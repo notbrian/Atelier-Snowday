@@ -13,11 +13,14 @@ let leftWrist = {
         y: 0
     }
 };
+var img;  // Declare variable 'img'.
+
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     video = createCapture(VIDEO);
     video.size(640, 480);
+    img = loadImage("images/skull.png");  // Load the image
 
     // Create a new poseNet method with a single detection
     poseNet = ml5.poseNet(video, modelReady);
@@ -35,7 +38,7 @@ function modelReady() {
 }
 
 function draw() {
-    background(0);
+    background("#006400");
     push();
     image(video, width - 640 * 0.2, height - 480 * 0.2, 640 * 0.2, 480 * 0.2);
     translate(width / 4, 0)
@@ -73,22 +76,26 @@ function drawKeypoints() {
             let keypoint = poses[i].pose.keypoints[j];
             // Only draw an ellipse is the pose probability is bigger than 0.2
             if (keypoint.score > 0.2) {
-                fill(255, 0, 0);
+                if(j > 0 && j < 5) {continue;}
+                fill(255);
                 noStroke();
                 ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
                 // Nose
                 fill(0,255,0)
                 if (j === 0) {
                     ellipse(keypoint.position.x, keypoint.position.y, 50, 50)
+                    imageMode(CENTER)
+                    image(img, keypoint.position.x + 30, keypoint.position.y , img.width/5, img.height/5);
+
                 }
                 // Left Wrist
                 if (j === 9) {
                     leftWrist = keypoint;
-                    ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
                 }
                 // Right Wrist
                 if (j === 10) {
-                    ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
                 }
             }
         }
@@ -103,7 +110,7 @@ function drawSkeleton() {
         for (let j = 0; j < poses[i].skeleton.length; j++) {
             let partA = poses[i].skeleton[j][0];
             let partB = poses[i].skeleton[j][1];
-            stroke(255, 0, 0);
+            stroke(255);
             line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
         }
     }
@@ -120,7 +127,7 @@ function snowflake() {
   
     // radius of snowflake spiral
     // chosen so the snowflakes are uniformly spread out in area
-    this.radius = sqrt(random(pow(width / 2, 2)));
+    this.radius = sqrt(random(pow(width / 1, 2)));
   
     this.update = function(time) {
       // x position follows a circle
@@ -145,7 +152,7 @@ function snowflake() {
 
     this.collide = function() {
         if(dist(leftWrist.position.x, leftWrist.position.y, this.posX, this.posY) < 50) {
-            this.color = color(0)
+            this.color = color("006400")
         }
     }
   }
