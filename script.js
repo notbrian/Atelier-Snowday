@@ -14,13 +14,14 @@ let leftWrist = {
     }
 };
 var img;  // Declare variable 'img'.
-
+var handImg
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     video = createCapture(VIDEO);
     video.size(640, 480);
     img = loadImage("images/skull.png");  // Load the image
+    handImg = loadImage("images/hand.png");
 
     // Create a new poseNet method with a single detection
     poseNet = ml5.poseNet(video, modelReady);
@@ -45,7 +46,6 @@ function draw() {
     // We can call both functions to draw all keypoints and the skeletons
     drawKeypoints();
     drawSkeleton();
-    pop();
 
   let t = frameCount / 60; // update time
 
@@ -61,6 +61,9 @@ function draw() {
     flake.display(); // draw snowflake
     flake.collide();
   }
+
+  pop();
+
 
 //   scale(-1,1);
 
@@ -91,11 +94,14 @@ function drawKeypoints() {
                 // Left Wrist
                 if (j === 9) {
                     leftWrist = keypoint;
-                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+                    fill(255,255,0)
+                    image(handImg, keypoint.position.x, keypoint.position.y , 100, 100);
+
                 }
                 // Right Wrist
                 if (j === 10) {
-                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+                    fill(255,0,0)
+                    image(handImg, keypoint.position.x, keypoint.position.y , 100, 100);
                 }
             }
         }
@@ -147,13 +153,14 @@ function snowflake() {
     };
   
     this.display = function() {
+      noStroke();
       fill(this.color)
       ellipse(this.posX, this.posY, this.size);
     };
 
     this.collide = function() {
         if(dist(leftWrist.position.x, leftWrist.position.y, this.posX, this.posY) < 50) {
-            this.color = color("006400")
+            this.size = 20
         }
     }
   }
