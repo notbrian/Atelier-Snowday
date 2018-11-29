@@ -50,7 +50,7 @@ function draw() {
   let t = frameCount / 60; // update time
 
   // create a random number of snowflakes each frame
-  for (var i = 0; i < random(5); i++) {
+  for (var i = 0; i < random(1); i++) {
     snowflakes.push(new snowflake()); // append snowflake object
   }
 
@@ -111,6 +111,7 @@ function drawSkeleton() {
             let partA = poses[i].skeleton[j][0];
             let partB = poses[i].skeleton[j][1];
             stroke(255);
+            strokeWeight(3);
             line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
         }
     }
@@ -122,7 +123,7 @@ function snowflake() {
     this.posX = 0;
     this.posY = random(-50, 0);
     this.initialangle = random(0, 2 * PI);
-    this.size = random(2, 5);
+    this.size = random(2, 10);
     this.color = color(255);
   
     // radius of snowflake spiral
