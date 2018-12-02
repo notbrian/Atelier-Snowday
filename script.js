@@ -15,7 +15,8 @@ let skeletons = [];
 // module aliases
 var Engine = Matter.Engine,
     World = Matter.World,
-    Bodies = Matter.Bodies;
+    Bodies = Matter.Bodies,
+    Body = Matter.Body;
 
 
 // create an engine
@@ -24,6 +25,7 @@ var world = engine.world;
 var snowflakes = [];
 var ground;
 
+var hand;
 
 var dx;
 var wind;
@@ -36,13 +38,21 @@ let leftWrist = {
     }
 };
 var img; // Declare variable 'img'.
-
+var vWidth ;
+var vHeight;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
 
     video = createCapture(VIDEO);
-    video.size(640, 480);
+
+    //  vWidth = windowWidth * 0.4;
+    //  vHeight = windowHeight * 0.4;
+
+    vWidth = 300 * (windowWidth/windowHeight);
+    vHeight = 300  * (windowWidth/windowHeight);
+    video.size(vWidth, vHeight);
+
     img = loadImage("images/skull.png"); // Load the image
 
     // Create a new poseNet method with a single detection
@@ -59,13 +69,15 @@ function setup() {
         isStatic: true
     }
     ground = Bodies.rectangle(width/2, height, width + 10, 100, options);
-
+    hand = Bodies.rectangle(width/2,0, 80, 400)
 
     World.add(world, ground);
+    World.add(world, hand);
+
 
 
     setInterval(function() {
-        if(snowflakes.length > 400) {return}
+        if(snowflakes.length > 100) {return}
         for (var i = 0; i < random(10); i++) {
             let x = random(1, width);
             let y = random(-300);
@@ -81,7 +93,7 @@ function setup() {
 }
 
 function modelReady() {
-    select('#status').html('Model Loaded');
+    // select('#status').html('Model Loaded');
 }
 
 function draw() {
@@ -105,13 +117,18 @@ function draw() {
     rectMode(CENTER);
     rect(ground.position.x, ground.position.y, width, 100);
 
-
+    push()
+    // rotate(hand.angle)
+    rect(hand.position.x, hand.position.y, 80, 400)
+    pop()
 
 
     push();
-    image(video, width - 640 * 0.2, height - 480 * 0.2, 640 * 0.2, 480 * 0.2);
-    translate(width / 4, 0)
+    image(video, width/2, height - vHeight , vWidth, vHeight );
+    // translate(width / 4, 0)
     // We can call both functions to draw all keypoints and the skeletons
+    // scale(windowWidth/vWidth, windowHeight/vHeight)
+    // scale(0.7, 0.7)
     drawKeypoints();
     drawSkeleton();
     pop();
@@ -132,21 +149,33 @@ function drawKeypoints() {
                 if (j > 0 && j < 5) {
                     continue;
                 }
+
+                var xMod = keypoint.position.x * windowWidth/vWidth
+                var yMod = keypoint.position.y * windowHeight/vHeight
+
                 fill(255);
                 noStroke();
-                ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
+                ellipse(xMod, yMod, 10, 10);
                 // Nose
                 fill(0, 255, 0)
                 if (j === 0) {
-                    ellipse(keypoint.position.x, keypoint.position.y, 50, 50)
+                    ellipse(xMod, yMod, 50, 50)
                     imageMode(CENTER)
-                    image(img, keypoint.position.x + 30, keypoint.position.y, img.width / 5, img.height / 5);
+                    image(img, xMod + 30, yMod, img.width / 5, img.height / 5);
 
                 }
                 // Left Wrist
                 if (j === 9) {
-                    leftWrist = keypoint;
-                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+                    leftWrist.position.x = xMod;
+                    leftWrist.position.y = yMod;
+
+                    Body.translate(hand, {
+                        x: (xMod - hand.position.x) * 0.1,
+                        y: (yMod - hand.position.y) * 0.1
+                    });
+                    // Body.setPosition(hand, {x: xMod, y: yMod})
+                    
+                } else {//delete
                 }
                 // Right Wrist
                 if (j === 10) {
@@ -165,9 +194,13 @@ function drawSkeleton() {
         for (let j = 0; j < poses[i].skeleton.length; j++) {
             let partA = poses[i].skeleton[j][0];
             let partB = poses[i].skeleton[j][1];
+
+            var xMod = windowWidth/vWidth
+            var yMod =  windowHeight/vHeight
             stroke(255);
             strokeWeight(3);
-            line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
+            
+            line(partA.position.x * xMod, partA.position.y * yMod, partB.position.x *xMod, partB.position.y * yMod);
         }
     }
 }
