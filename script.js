@@ -37,9 +37,11 @@ let leftWrist = {
         y: 0
     }
 };
+
 var img; // Declare variable 'img'.
 var vWidth ;
 var vHeight;
+
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -54,6 +56,7 @@ function setup() {
     video.size(vWidth, vHeight);
 
     img = loadImage("images/skull.png"); // Load the image
+
 
     // Create a new poseNet method with a single detection
     poseNet = ml5.poseNet(video, modelReady);
@@ -131,9 +134,6 @@ function draw() {
     // scale(0.7, 0.7)
     drawKeypoints();
     drawSkeleton();
-    pop();
-
-
 }
 
 // A function to draw ellipses over the detected keypoints
@@ -179,7 +179,8 @@ function drawKeypoints() {
                 }
                 // Right Wrist
                 if (j === 10) {
-                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+                    fill(255,0,0)
+                    image(handImg, keypoint.position.x, keypoint.position.y , 100, 100);
                 }
             }
         }
@@ -204,7 +205,6 @@ function drawSkeleton() {
         }
     }
 }
-
 
 function mouseDragged() {
     let radius = random(1, 20);
