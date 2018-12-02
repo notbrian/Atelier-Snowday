@@ -88,8 +88,10 @@ function drawKeypoints() {
                 if (j === 0) {
                     ellipse(keypoint.position.x, keypoint.position.y, 50, 50)
                     imageMode(CENTER)
+                    push()
+                    rotate()
                     image(img, keypoint.position.x + 30, keypoint.position.y , img.width/5, img.height/5);
-
+                    pop()
                 }
                 // Left Wrist
                 if (j === 9) {
@@ -129,21 +131,21 @@ function snowflake() {
     this.posX = 0;
     this.posY = random(-50, 0);
     this.initialangle = random(0, 2 * PI);
-    this.size = random(2, 10);
+    this.size = random(2, 15);
     this.color = color(255);
   
     // radius of snowflake spiral
     // chosen so the snowflakes are uniformly spread out in area
-    this.radius = sqrt(random(pow(width / 1, 2)));
+    this.radius = sqrt(random(pow(width / 1.5, 2)));
   
     this.update = function(time) {
       // x position follows a circle
-      let w = 0.6; // angular speed
+      let w = 0.1; // angular speed
       let angle = w * time + this.initialangle;
       this.posX = width / 2 + this.radius * sin(angle);
   
       // different size snowflakes fall at slightly different y speeds
-      this.posY += pow(this.size, 0.5);
+      this.posY += pow(this.size, 0.6);
   
       // delete snowflake if past end of screen
       if (this.posY > height) {
@@ -160,7 +162,9 @@ function snowflake() {
 
     this.collide = function() {
         if(dist(leftWrist.position.x, leftWrist.position.y, this.posX, this.posY) < 50) {
-            this.size = 20
+            this.posX = leftWrist.position.x;
+            this.posy = leftWrist.position.y;
+
         }
     }
   }
