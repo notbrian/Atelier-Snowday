@@ -17,12 +17,16 @@ var Engine = Matter.Engine,
     World = Matter.World,
     Bodies = Matter.Bodies;
 
+
 // create an engine
 var engine = Engine.create();
 var world = engine.world;
 var snowflakes = [];
 var ground;
 
+
+var dx;
+var wind;
 // P5 Variables
 
 let leftWrist = {
@@ -54,10 +58,25 @@ function setup() {
     var options = {
         isStatic: true
     }
-    ground = Bodies.rectangle(width/2, height, width, 100, options);
+    ground = Bodies.rectangle(width/2, height, width + 10, 100, options);
+
 
     World.add(world, ground);
 
+
+    setInterval(function() {
+        if(snowflakes.length > 400) {return}
+        for (var i = 0; i < random(10); i++) {
+            let x = random(1, width);
+            let y = random(-300);
+            let radius = random(5, 20);
+            snowflakes.push(new Snowflake(x, y, radius));
+        }
+
+
+    }, 500)
+
+   
 
 }
 
@@ -68,9 +87,17 @@ function modelReady() {
 function draw() {
     background("#006400");
     Engine.update(engine);
-
+    // dx = map(sin(frameCount / 1000),-1,1,-0.0001,0.0001);
+    // wind = {x: dx, y: 0};
+ 
     for (var i = 0; i < snowflakes.length; i++) {
         snowflakes[i].show();
+        // Matter.Body.applyForce(snowflakes[i].body, {x: width/2, y: -400}, wind)
+        if(snowflakes[i].isOffScreen()) {
+            snowflakes[i].delete();
+            snowflakes.splice(i, 1);
+            i--;
+        }
     }
 
     noStroke(255);
@@ -146,6 +173,8 @@ function drawSkeleton() {
 }
 
 
-function mousePressed() {
-    snowflakes.push(new Snowflake(mouseX, mouseY, random(10, 40)));
+function mouseDragged() {
+    let radius = random(1, 20);
+
+    snowflakes.push(new Snowflake(mouseX, mouseY, radius));
 }
