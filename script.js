@@ -179,8 +179,7 @@ function drawKeypoints() {
                 }
                 // Right Wrist
                 if (j === 10) {
-                    fill(255,0,0)
-                    image(handImg, keypoint.position.x, keypoint.position.y , 100, 100);
+                
                 }
             }
         }
