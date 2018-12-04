@@ -1,8 +1,10 @@
 function Snowflake(x, y, radius) {
     var options = {
-      friction: 1,
+      friction: 0,
       restitution: 0,
       frictionAir: 0.05,
+      density: 0.00000000001,
+      frictionStatic: 0.3
       // force: {x: random(-0.01, 0.01), y: random(-0.01, 0.01)}
     }
     this.body = Bodies.circle(x, y, radius, options);

@@ -49,14 +49,16 @@ function setup() {
     //  vWidth = windowWidth * 0.4;
     //  vHeight = windowHeight * 0.4;
 
-    vWidth = 300 * (windowWidth/windowHeight);
-    vHeight = 300  * (windowWidth/windowHeight);
+    // vWidth = 300 * (windowWidth/windowHeight);
+    // vHeight = 300  * (windowWidth/windowHeight);
+    vWidth = 640
+    vHeight = 480
     video.size(vWidth, vHeight);
 
     img = loadImage("images/skull.png"); // Load the image
     let poseOptions = {
         flipHorizontal: true,
-        maxPoseDetections: 5,
+        maxPoseDetections: 2,
 
     }
 
@@ -77,15 +79,15 @@ function setup() {
     }
     ground = Bodies.rectangle(width/2, height, width + 10, 100, options);
 
-    for(let i = 0; i < 6; i++) {
+    for(let i = 0; i < 2; i++) {
         var options = {
-            friction: 1,
+            friction: 0,
             restitution: 0,
           }
 
           let pair = []
           for(let j = 0; j < 2; j++) {
-            pair.push(Bodies.rectangle(width/2,0, 80, 80, options))
+            pair.push(Bodies.rectangle(width/2,0, 20, 80, options))
             World.add(world, pair[j]);
             
           }
@@ -102,7 +104,6 @@ function setup() {
 
 
     setInterval(function() {
-        if(snowflakes.length > 100) {return}
         for (var i = 0; i < random(10); i++) {
             let x = random(1, width);
             let y = random(-300);
@@ -138,11 +139,14 @@ function draw() {
     }
 
     noStroke(255);
-    fill(170);
+    fill(0);
     rectMode(CENTER);
     rect(ground.position.x, ground.position.y, width, 100);
+    
     for(let pair in hands) {
         for(hand in hands[pair]) {
+            fill(170);
+
             push()
             translate(hands[pair][hand].position.x, hands[pair][hand].position.y);
             rectMode(CENTER);
@@ -170,6 +174,7 @@ function draw() {
 function drawKeypoints() {
     // Loop through all the poses detected
     for (let i = 0; i < poses.length; i++) {
+        console.log(poses.length)
         // For each pose detected, loop through all the keypoints
         for (let j = 0; j < poses[i].pose.keypoints.length; j++) {
             // A keypoint is an object describing a body part (like rightArm or leftShoulder)
@@ -193,16 +198,19 @@ function drawKeypoints() {
                     image(img, xMod + 30, yMod, img.width / 5, img.height / 5);
 
                 }
+
+                if(i >= 2) {break;}
+
                 // Left Wrist
-                console.log(i, hands[i]) 
+                // console.log(i, hands[i]) 
                 let leftHand = hands[i][0]
 
                 if (j === 9) {
             
 
                     Body.translate(leftHand, {
-                        x: (xMod - leftHand.position.x) * 0.8,
-                        y: (yMod - leftHand.position.y) * 0.8
+                        x: (xMod - leftHand.position.x) * 0.5,
+                        y: (yMod - leftHand.position.y) * 0.5
                     });
                     // Body.setPosition(hand, {x: xMod, y: yMod})
                     
@@ -213,10 +221,10 @@ function drawKeypoints() {
 
                 if (j === 10) {
                     Body.translate(hands[i][1], {
-                        x: (xMod - hands[i][1].position.x) * 0.8,
-                        y: (yMod - hands[i][1].position.y) * 0.8
+                        x: (xMod - hands[i][1].position.x) * 0.5,
+                        y: (yMod - hands[i][1].position.y) * 0.5
                     });
-                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+
                 }
             }
         }
@@ -234,8 +242,10 @@ function drawSkeleton() {
 
             var xMod = windowWidth/vWidth
             var yMod =  windowHeight/vHeight
+        
             stroke(255);
-            strokeWeight(3);
+            // stroke(random(255), random(255), random(255));
+            strokeWeight(6);
             
             line(partA.position.x * xMod, partA.position.y * yMod, partB.position.x *xMod, partB.position.y * yMod);
         }
