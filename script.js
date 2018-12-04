@@ -25,7 +25,7 @@ var world = engine.world;
 var snowflakes = [];
 var ground;
 
-var hand;
+let hands = [];
 
 var dx;
 var wind;
@@ -54,11 +54,16 @@ function setup() {
     video.size(vWidth, vHeight);
 
     img = loadImage("images/skull.png"); // Load the image
+    let poseOptions = {
+        flipHorizontal: true,
+    }
 
     // Create a new poseNet method with a single detection
-    poseNet = ml5.poseNet(video, modelReady);
+    poseNet = ml5.poseNet(video, poseOptions, modelReady);
     // This sets up an event that fills the global variable "poses"
     // with an array every time new poses are detected
+
+   
     poseNet.on('pose', function (results) {
         poses = results;
     });
@@ -69,10 +74,28 @@ function setup() {
         isStatic: true
     }
     ground = Bodies.rectangle(width/2, height, width + 10, 100, options);
-    hand = Bodies.rectangle(width/2,0, 80, 400)
+
+    for(let i = 0; i < 5; i++) {
+        var options = {
+            friction: 1,
+            restitution: 0,
+          }
+
+          let pair = []
+          for(let j = 0; j < 2; j++) {
+            pair.push(Bodies.rectangle(width/2,0, 80, 80, options))
+            World.add(world, pair[j]);
+            
+          }
+
+          hands.push(pair)
+     
+
+    }
+
+
 
     World.add(world, ground);
-    World.add(world, hand);
 
 
 
@@ -117,14 +140,20 @@ function draw() {
     rectMode(CENTER);
     rect(ground.position.x, ground.position.y, width, 100);
 
-    push()
-    // rotate(hand.angle)
-    rect(hand.position.x, hand.position.y, 80, 400)
-    pop()
+    for(let pair in hands) {
+        for(hand in hands[pair]) {
+            push()
+            translate(hands[pair][hand].position.x, hands[pair][hand].position.y);
+            rectMode(CENTER);
+            rotate(hands[pair][hand].angle)
+            rect(0,0, 80, 80)
+            pop()
+        }
+    }
 
 
     push();
-    image(video, width/2, height - vHeight , vWidth, vHeight );
+    image(video, width - vWidth * 0.1, height - vHeight * 0.1, vWidth* 0.1, vHeight * 0.1);
     // translate(width / 4, 0)
     // We can call both functions to draw all keypoints and the skeletons
     // scale(windowWidth/vWidth, windowHeight/vHeight)
@@ -152,7 +181,7 @@ function drawKeypoints() {
 
                 var xMod = keypoint.position.x * windowWidth/vWidth
                 var yMod = keypoint.position.y * windowHeight/vHeight
-
+                
                 fill(255);
                 noStroke();
                 ellipse(xMod, yMod, 10, 10);
@@ -169,9 +198,9 @@ function drawKeypoints() {
                     leftWrist.position.x = xMod;
                     leftWrist.position.y = yMod;
 
-                    Body.translate(hand, {
-                        x: (xMod - hand.position.x) * 0.1,
-                        y: (yMod - hand.position.y) * 0.1
+                    Body.translate(hands[j][0], {
+                        x: (xMod - hands[j][0].position.x) * 0.8,
+                        y: (yMod - hands[j][0].position.y) * 0.8
                     });
                     // Body.setPosition(hand, {x: xMod, y: yMod})
                     
@@ -179,6 +208,10 @@ function drawKeypoints() {
                 }
                 // Right Wrist
                 if (j === 10) {
+                    Body.translate(hands[j][1], {
+                        x: (xMod - hands[j][1].position.x) * 0.8,
+                        y: (yMod - hands[j][1].position.y) * 0.8
+                    });
                     // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
                 }
             }
