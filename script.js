@@ -56,6 +56,8 @@ function setup() {
     img = loadImage("images/skull.png"); // Load the image
     let poseOptions = {
         flipHorizontal: true,
+        maxPoseDetections: 5,
+
     }
 
     // Create a new poseNet method with a single detection
@@ -75,7 +77,7 @@ function setup() {
     }
     ground = Bodies.rectangle(width/2, height, width + 10, 100, options);
 
-    for(let i = 0; i < 5; i++) {
+    for(let i = 0; i < 6; i++) {
         var options = {
             friction: 1,
             restitution: 0,
@@ -139,7 +141,6 @@ function draw() {
     fill(170);
     rectMode(CENTER);
     rect(ground.position.x, ground.position.y, width, 100);
-
     for(let pair in hands) {
         for(hand in hands[pair]) {
             push()
@@ -181,7 +182,6 @@ function drawKeypoints() {
 
                 var xMod = keypoint.position.x * windowWidth/vWidth
                 var yMod = keypoint.position.y * windowHeight/vHeight
-                
                 fill(255);
                 noStroke();
                 ellipse(xMod, yMod, 10, 10);
@@ -194,23 +194,27 @@ function drawKeypoints() {
 
                 }
                 // Left Wrist
-                if (j === 9) {
-                    leftWrist.position.x = xMod;
-                    leftWrist.position.y = yMod;
+                console.log(i, hands[i]) 
+                let leftHand = hands[i][0]
 
-                    Body.translate(hands[j][0], {
-                        x: (xMod - hands[j][0].position.x) * 0.8,
-                        y: (yMod - hands[j][0].position.y) * 0.8
+                if (j === 9) {
+            
+
+                    Body.translate(leftHand, {
+                        x: (xMod - leftHand.position.x) * 0.8,
+                        y: (yMod - leftHand.position.y) * 0.8
                     });
                     // Body.setPosition(hand, {x: xMod, y: yMod})
                     
                 } else {//delete
                 }
                 // Right Wrist
+                let rightHand = hands[i][1]
+
                 if (j === 10) {
-                    Body.translate(hands[j][1], {
-                        x: (xMod - hands[j][1].position.x) * 0.8,
-                        y: (yMod - hands[j][1].position.y) * 0.8
+                    Body.translate(hands[i][1], {
+                        x: (xMod - hands[i][1].position.x) * 0.8,
+                        y: (yMod - hands[i][1].position.y) * 0.8
                     });
                     // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
                 }
