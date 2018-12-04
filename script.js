@@ -102,7 +102,7 @@ function setup() {
 
 
     setInterval(function() {
-        if(snowflakes.length > 100) {return}
+        if(snowflakes.length > 300) {return}
         for (var i = 0; i < random(10); i++) {
             let x = random(1, width);
             let y = random(-300);
