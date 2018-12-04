@@ -216,7 +216,7 @@ function drawKeypoints() {
                         x: (xMod - hands[i][1].position.x) * 0.8,
                         y: (yMod - hands[i][1].position.y) * 0.8
                     });
-                    // ellipse(keypoint.position.x, keypoint.position.y, 100, 100)
+
                 }
             }
         }
