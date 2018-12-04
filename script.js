@@ -25,7 +25,7 @@ var world = engine.world;
 var snowflakes = [];
 var ground;
 
-var hand;
+let hands = [];
 
 var dx;
 var wind;
@@ -37,11 +37,9 @@ let leftWrist = {
         y: 0
     }
 };
-
 var img; // Declare variable 'img'.
 var vWidth ;
 var vHeight;
-
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -56,12 +54,18 @@ function setup() {
     video.size(vWidth, vHeight);
 
     img = loadImage("images/skull.png"); // Load the image
+    let poseOptions = {
+        flipHorizontal: true,
+        maxPoseDetections: 5,
 
+    }
 
     // Create a new poseNet method with a single detection
-    poseNet = ml5.poseNet(video, modelReady);
+    poseNet = ml5.poseNet(video, poseOptions, modelReady);
     // This sets up an event that fills the global variable "poses"
     // with an array every time new poses are detected
+
+   
     poseNet.on('pose', function (results) {
         poses = results;
     });
@@ -72,10 +76,28 @@ function setup() {
         isStatic: true
     }
     ground = Bodies.rectangle(width/2, height, width + 10, 100, options);
-    hand = Bodies.rectangle(width/2,0, 80, 400)
+
+    for(let i = 0; i < 6; i++) {
+        var options = {
+            friction: 1,
+            restitution: 0,
+          }
+
+          let pair = []
+          for(let j = 0; j < 2; j++) {
+            pair.push(Bodies.rectangle(width/2,0, 80, 80, options))
+            World.add(world, pair[j]);
+            
+          }
+
+          hands.push(pair)
+     
+
+    }
+
+
 
     World.add(world, ground);
-    World.add(world, hand);
 
 
 
@@ -119,21 +141,29 @@ function draw() {
     fill(170);
     rectMode(CENTER);
     rect(ground.position.x, ground.position.y, width, 100);
-
-    push()
-    // rotate(hand.angle)
-    rect(hand.position.x, hand.position.y, 80, 400)
-    pop()
+    for(let pair in hands) {
+        for(hand in hands[pair]) {
+            push()
+            translate(hands[pair][hand].position.x, hands[pair][hand].position.y);
+            rectMode(CENTER);
+            rotate(hands[pair][hand].angle)
+            rect(0,0, 80, 80)
+            pop()
+        }
+    }
 
 
     push();
-    image(video, width/2, height - vHeight , vWidth, vHeight );
+    image(video, width - vWidth * 0.1, height - vHeight * 0.1, vWidth* 0.1, vHeight * 0.1);
     // translate(width / 4, 0)
     // We can call both functions to draw all keypoints and the skeletons
     // scale(windowWidth/vWidth, windowHeight/vHeight)
     // scale(0.7, 0.7)
     drawKeypoints();
     drawSkeleton();
+    pop();
+
+
 }
 
 // A function to draw ellipses over the detected keypoints
@@ -152,7 +182,6 @@ function drawKeypoints() {
 
                 var xMod = keypoint.position.x * windowWidth/vWidth
                 var yMod = keypoint.position.y * windowHeight/vHeight
-
                 fill(255);
                 noStroke();
                 ellipse(xMod, yMod, 10, 10);
@@ -165,21 +194,29 @@ function drawKeypoints() {
 
                 }
                 // Left Wrist
-                if (j === 9) {
-                    leftWrist.position.x = xMod;
-                    leftWrist.position.y = yMod;
+                console.log(i, hands[i]) 
+                let leftHand = hands[i][0]
 
-                    Body.translate(hand, {
-                        x: (xMod - hand.position.x) * 0.1,
-                        y: (yMod - hand.position.y) * 0.1
+                if (j === 9) {
+            
+
+                    Body.translate(leftHand, {
+                        x: (xMod - leftHand.position.x) * 0.8,
+                        y: (yMod - leftHand.position.y) * 0.8
                     });
                     // Body.setPosition(hand, {x: xMod, y: yMod})
                     
                 } else {//delete
                 }
                 // Right Wrist
+                let rightHand = hands[i][1]
+
                 if (j === 10) {
-                
+                    Body.translate(hands[i][1], {
+                        x: (xMod - hands[i][1].position.x) * 0.8,
+                        y: (yMod - hands[i][1].position.y) * 0.8
+                    });
+
                 }
             }
         }
@@ -204,6 +241,7 @@ function drawSkeleton() {
         }
     }
 }
+
 
 function mouseDragged() {
     let radius = random(1, 20);
